@@ -42,110 +42,137 @@ import de.flapdoodle.embed.process.runtime.Network;
 
 public abstract class MongoTestBase {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+  private Logger log = LoggerFactory.getLogger(getClass());
 
-	private IFeatureAwareVersion version = Version.Main.PRODUCTION;
+  private IFeatureAwareVersion version = Version.Main.PRODUCTION;
 
-	private String mongodHost = "localhost";
-	private int mongodPort = 27099;
+  private String mongodHost = "localhost";
+  private int mongodPort = 27099;
 
-	protected MongodExecutable mongoExec = null;
-	protected MongodProcess mongod = null;
-	protected MongoClient mongoClient = null;
+  protected MongodExecutable mongoExec = null;
+  protected MongodProcess mongod = null;
+  protected MongoClient mongoClient = null;
 
-	/**
-	 * 
-	 * Starts a mongodb instance and returns a working client to it.
-	 * 
-	 * @return the client that can connect to the working instance
-	 * 
-	 * @throws UnknownHostException
-	 * @throws IOException
-	 */
-	protected MongoClient startMongo() throws UnknownHostException, IOException {
+  /**
+   *
+   * Starts a mongodb instance and returns a working client to it.
+   *
+   * @return the client that can connect to the working instance
+   *
+   * @throws UnknownHostException the provided host and port is not available
+   * @throws IOException          some low level error connecting the the mongo db failed
+   */
+  protected MongoClient startMongo() throws UnknownHostException, IOException {
 
-		// start embedded mongo
-		IRuntimeConfig runConfig = new RuntimeConfigBuilder().defaultsWithLogger(Command.MongoD, log).build();
+    // start embedded mongo
+    IRuntimeConfig runConfig = new RuntimeConfigBuilder().defaultsWithLogger(Command.MongoD, log).build();
 
-		MongodStarter runtime = MongodStarter.getInstance(runConfig);
+    MongodStarter runtime = MongodStarter.getInstance(runConfig);
 
-		IMongodConfig mongodConfig = new MongodConfigBuilder().version(version)
-				.net(new Net(mongodPort, Network.localhostIsIPv6())).build();
+    IMongodConfig mongodConfig = new MongodConfigBuilder().version(version)
+      .net(new Net(mongodPort, Network.localhostIsIPv6())).build();
 
-		mongoExec = runtime.prepare(mongodConfig);
-		mongod = mongoExec.start();
+    mongoExec = runtime.prepare(mongodConfig);
+    mongod = mongoExec.start();
 
-		// setup the client for the test
-		mongoClient = new MongoClient(getMongoHost(), getMongoPort());
+    int waitCount = 1;
+    while (!mongod.isProcessRunning() || waitCount > 10) {
+      try {
+        if (log.isDebugEnabled()) {
+          log.debug("Force wait start {}", waitCount);
+        }
+        waitCount++;
+        Thread.sleep(1000);
+      } catch (InterruptedException ignore) {
+      }
+    }
 
-		return this.mongoClient;
+    // setup the client for the test
+    mongoClient = new MongoClient(getMongoHost(), getMongoPort());
 
-	}
+    return this.mongoClient;
 
-	protected void shutdownMongo() {
+  }
 
-		if (mongod != null)
-			mongod.stop();
+  protected void shutdownMongo() {
 
-		if (mongoExec != null)
-			mongoExec.stop();
+    if (mongod != null) {
+      mongod.stop();
 
-	}
+      int waitCount = 1;
+      while (mongod.isProcessRunning() || waitCount > 10) {
+        try {
+          if (log.isDebugEnabled()) {
+            log.debug("Force wait shutdown {}", waitCount);
+          }
+          waitCount++;
+          Thread.sleep(1000);
+        } catch (InterruptedException ignore) {
+        }
+      }
 
-	public String getMongoHost() {
-		return mongodHost;
-	}
+    }
 
-	protected void setMogoHost(String host) {
-		this.mongodHost = host;
-	}
+    if (mongoExec != null)
+      mongoExec.stop();
 
-	public int getMongoPort() {
-		return mongodPort;
-	}
 
-	protected void setMogoPort(int port) {
-		this.mongodPort = port;
-	}
+  }
 
-	protected MongoClient getMongoClient() {
-		return mongoClient;
-	}
+  public String getMongoHost() {
+    return mongodHost;
+  }
 
-	protected MongoTestBase withMongoHost(String host) {
-		setMogoHost(host);
-		return this;
-	}
+  protected void setMogoHost(String host) {
+    this.mongodHost = host;
+  }
 
-	protected MongoTestBase withMongoPort(int port) {
-		setMogoPort(port);
-		return this;
-	}
+  public int getMongoPort() {
+    return mongodPort;
+  }
 
-	public String getVersion() {
-		return version == null ? Version.Main.PRODUCTION.asInDownloadPath() : version.asInDownloadPath();
-	}
+  protected void setMogoPort(int port) {
+    this.mongodPort = port;
+  }
 
-	public void setVersion(String version) {
-		setVersion(version, true);
-	}
+  protected MongoClient getMongoClient() {
+    return mongoClient;
+  }
 
-	public void setVersion(String version, boolean syncDelay) {
-		if (syncDelay) {
-			this.version = Versions.withFeatures(new GenericVersion(version), Feature.SYNC_DELAY);
-		} else {
-			this.version = Versions.withFeatures(new GenericVersion(version));
-		}
-	}
+  protected MongoTestBase withMongoHost(String host) {
+    setMogoHost(host);
+    return this;
+  }
 
-	public MongoTestBase withVersion(String version) {
-		setVersion(version);
-		return this;
-	}
+  protected MongoTestBase withMongoPort(int port) {
+    setMogoPort(port);
+    return this;
+  }
 
-	public MongoTestBase withVersion(String version, boolean syncDelay) {
-		setVersion(version, syncDelay);
-		return this;
-	}
+  public String getVersion() {
+    return version == null ? Version.Main.PRODUCTION.asInDownloadPath() : version.asInDownloadPath();
+  }
+
+  public void setVersion(String version) {
+    setVersion(version, true);
+  }
+
+  public void setVersion(String version, boolean syncDelay) {
+    if (syncDelay) {
+      this.version = Versions.withFeatures(new GenericVersion(version), Feature.SYNC_DELAY);
+    } else {
+      this.version = Versions.withFeatures(new GenericVersion(version));
+    }
+  }
+
+  public MongoTestBase withVersion(String version) {
+    setVersion(version);
+    return this;
+  }
+
+  public MongoTestBase withVersion(String version, boolean syncDelay) {
+    setVersion(version, syncDelay);
+    return this;
+  }
 
 }

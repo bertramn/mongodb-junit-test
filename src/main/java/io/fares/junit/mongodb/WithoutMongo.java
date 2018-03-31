@@ -24,10 +24,10 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * 
+ *
  * An annotation for test methods that do not require the {@link MongoRule} to
  * create and tear down the instance.
- * 
+ *
  */
 @Retention(RUNTIME)
 @Documented

@@ -26,22 +26,22 @@ import org.mockito.stubbing.Answer;
 
 public class MongoRuleTest {
 
-	@Test
-	public void testRuleStart() throws Throwable {
+  @Test
+  public void testRuleStart() throws Throwable {
 
-		MongoRule rule = new MongoRule();
+    MongoRule rule = new MongoRule();
 
-		Statement statement = mock(Statement.class);
-		doAnswer(new Answer<Object>() {
-			@Override
-			public Object answer(InvocationOnMock invocation) throws Throwable {
-				Thread.sleep(2000L);
-				return "done";
-			}
-		}).when(statement).evaluate();
+    Statement statement = mock(Statement.class);
+    doAnswer(new Answer<Object>() {
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+        Thread.sleep(2000L);
+        return "done";
+      }
+    }).when(statement).evaluate();
 
-		rule.apply(statement, mock(Description.class)).evaluate();
+    rule.apply(statement, mock(Description.class)).evaluate();
 
-	}
+  }
 
 }
