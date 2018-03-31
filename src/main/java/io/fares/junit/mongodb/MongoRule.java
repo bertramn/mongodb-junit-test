@@ -28,6 +28,7 @@ import com.mongodb.MongoClient;
  * server when the test has finished.
  *
  * <pre>
+ * {@code}
  * import static org.junit.Assert.*;
  * import org.junit.Rule;
  * import org.junit.Test;
@@ -60,6 +61,7 @@ import com.mongodb.MongoClient;
  *   }
  *
  * }
+ * {@code}
  * </pre>
  *
  * @author Niels Bertram
@@ -109,8 +111,8 @@ public class MongoRule implements TestRule {
   }
 
   /**
-   * May be overridden in the implementation to do stuff <em>after</em> the
-   * embedded test case is set up but <em>before</em> the current test is
+   * May be overridden in the implementation to do stuff <strong>after</strong> the
+   * embedded test case is set up but <strong>before</strong> the current test is
    * actually run.
    *
    * @throws Throwable something failed in tbe before handler
@@ -120,8 +122,8 @@ public class MongoRule implements TestRule {
   }
 
   /**
-   * May be overridden in the implementation to do stuff after the current
-   * test was run but <em>before<em> the mongo server is shutdown.
+   * May be overridden in the implementation to do stuff <strong>after</strong> the current
+   * test was run but <strong>before</strong> the mongo server is shutdown.
    */
   protected void after() {
 
@@ -169,6 +171,7 @@ public class MongoRule implements TestRule {
    * Set the host name on which the monogd instance will be run on
    *
    * @param host the machine name or an IP address
+   * @return self to continue fluently
    */
   public MongoRule host(String host) {
     setMogoHost(host);
@@ -179,6 +182,7 @@ public class MongoRule implements TestRule {
    * Set the mongod port on which the database will listen
    *
    * @param port the port number
+   * @return self to continue fluently
    */
   public MongoRule port(int port) {
     setMogoPort(port);
@@ -189,6 +193,7 @@ public class MongoRule implements TestRule {
    * Specify the exact version of the monogdb instance to be started.
    *
    * @param version the version as valid mongodb version number
+   * @return self to continue fluently
    */
   public MongoRule version(String version) {
     setVersion(version);
@@ -200,6 +205,7 @@ public class MongoRule implements TestRule {
    *
    * @param version   the version as valid mongodb version number
    * @param syncDelay true if the download is to be retrieved with sync delay
+   * @return self to continue fluently
    */
   public MongoRule version(String version, boolean syncDelay) {
     setVersion(version, syncDelay);
