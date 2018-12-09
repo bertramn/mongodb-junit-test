@@ -1,6 +1,7 @@
 package io.fares.junit.mongodb;
 
 import com.mongodb.MongoClient;
+import de.flapdoodle.embed.mongo.distribution.IFeatureAwareVersion;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -84,6 +85,19 @@ public class MongoExtension extends MongoTestBase implements BeforeEachCallback,
       extension.setVersion(version);
       return this;
     }
+
+    /**
+     * Specify the exact version of the monogdb instance to be started.
+     *
+     * @param version the version as valid mongodb version number
+     * @return this builder
+     */
+    public Builder version(IFeatureAwareVersion version) {
+      extension.setVersion(version);
+      return this;
+    }
+
+
 
     /**
      * Specify the exact version of the monogdb instance to be started.

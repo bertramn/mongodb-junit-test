@@ -38,7 +38,7 @@ public class MongoExtensionIntegrationTest {
   ExtensionContext context;
 
   @Spy
-  MongoExtension extension = MongoExtension.builder().build();
+  MongoExtension extension = MongoExtension.defaultMongo();
 
   @Test
   public void itShouldStartBefore() throws Exception {

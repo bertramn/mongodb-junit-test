@@ -67,10 +67,10 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <slf4j.version>1.7.25</slf4j.version>
-    <mongo.driver.version>3.6.3</mongo.driver.version>
-    <flapdoodle.process.version>2.0.2</flapdoodle.process.version>
-    <flapdoodle.mongo.version>2.0.3</flapdoodle.mongo.version>
-    <jna.version>4.5.1</jna.version>
+    <mongo.driver.version>3.9.1</mongo.driver.version>
+    <flapdoodle.process.version>2.0.5</flapdoodle.process.version>
+    <flapdoodle.mongo.version>2.1.1</flapdoodle.mongo.version>
+    <jna.version>4.5.2</jna.version>
     <junit.jupiter.version>5.3.2</junit.jupiter.version>
     <mockito.version>2.23.4</mockito.version>
     <logback.version>1.2.3</logback.version>
