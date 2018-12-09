@@ -52,11 +52,9 @@ public abstract class MongoTestBase {
   protected MongoClient mongoClient = null;
 
   /**
-   *
    * Starts a mongodb instance and returns a working client to it.
    *
    * @return the client that can connect to the working instance
-   *
    * @throws UnknownHostException the provided host and port is not available
    * @throws IOException          some low level error connecting the the mongo db failed
    */
@@ -73,16 +71,22 @@ public abstract class MongoTestBase {
     mongoExec = runtime.prepare(mongodConfig);
     mongod = mongoExec.start();
 
-    int waitCount = 1;
-    while (!mongod.isProcessRunning() || waitCount > 10) {
-      try {
+    try {
+
+      int waitCount = 1;
+      while (!mongod.isProcessRunning() || waitCount > 10) {
         if (log.isDebugEnabled()) {
           log.debug("Force wait start {}", waitCount);
         }
         waitCount++;
         Thread.sleep(1000);
-      } catch (InterruptedException ignore) {
+
       }
+
+      // mongo starts a monitor thread which will bomb out if we are closing the database too soon
+      Thread.sleep(1000);
+
+    } catch (InterruptedException ignore) {
     }
 
     // setup the client for the test
@@ -156,11 +160,23 @@ public abstract class MongoTestBase {
   }
 
   public void setVersion(String version, boolean syncDelay) {
+    setVersion(version,true, syncDelay);
+  }
+
+  public void setVersion(String version, boolean production, boolean syncDelay) {
+
+    Version.Main versionConfig = production ? Version.Main.PRODUCTION : Version.Main.DEVELOPMENT;
+
     if (syncDelay) {
-      this.version = Versions.withFeatures(new GenericVersion(version), Feature.SYNC_DELAY);
-    } else {
-      this.version = Versions.withFeatures(new GenericVersion(version));
+      versionConfig.enabled(Feature.SYNC_DELAY);
     }
+
+    setVersion(Versions.withFeatures(new GenericVersion(version), versionConfig.getFeatures()));
+
+  }
+
+  public void setVersion(IFeatureAwareVersion version) {
+    this.version = version;
   }
 
   public MongoTestBase withVersion(String version) {
