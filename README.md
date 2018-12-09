@@ -5,7 +5,7 @@ This library contains a simple JUnit rule that will bootstrap an embedded mongod
 The library will use the embedded mongo framework from flapdoodle and will start a mongodb instance on localhost and port 27099. The port, host ip and mongodb version can be configured via fluent methods on `MongoRule`.
 
 
-Simple Example: 
+Simple Example for JUnit4: 
 
 ```java
 import static org.junit.Assert.*;
@@ -26,6 +26,36 @@ public class SomeTestWithMongoDB {
     MongoClient client = mongo.getMongoClient();
     assertNotNull(client);
     // whatever needs to be done in mongo using the provided monog client
+
+  }
+
+  @Test
+  @WithoutMongo
+  public void testSomethingWithoutMongoRule() {
+
+    MongoClient client = mongo.getMongoClient();
+    assertNull(client);
+    // whatever needs to be done without mongo
+
+  }
+
+}
+```
+
+Simple Example for JUnit5:
+
+```java
+public class SomeTestWithMongoDB {
+
+  @RegisterExtension
+  MongoExtension mongo = MongoExtension.builder().build();
+
+  @Test
+  public void testSomethingWithMongoRule() {
+
+    MongoClient client = mongo.getMongoClient();
+    assertNotNull(client);
+    // whatever needs to be done in mongo using the provided mongo client
 
   }
 

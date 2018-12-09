@@ -16,22 +16,31 @@
  */
 package io.fares.junit.mongodb;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import com.mongodb.MongoClient;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-/**
- *
- * An annotation for test methods that do not require the {@link MongoRule} to
- * create and tear down the instance.
- *
- */
-@Retention(RUNTIME)
-@Documented
-@Target(METHOD)
-public @interface WithoutMongo {
+public class MongoExtensionIntegrationTestExample {
+
+  @RegisterExtension
+  MongoExtension mongo = MongoExtension.builder().build();
+
+  @Test
+  public void testSomethingWithMongoRule() {
+    MongoClient client = mongo.getMongoClient();
+    assertNotNull(client);
+    // whatever needs to be done in mongo using the provided mongo client
+  }
+
+  @Test
+  @WithoutMongo
+  public void testSomethingWithoutMongoRule() {
+    MongoClient client = mongo.getMongoClient();
+    assertNull(client);
+    // whatever needs to be done without mongo
+  }
 
 }
