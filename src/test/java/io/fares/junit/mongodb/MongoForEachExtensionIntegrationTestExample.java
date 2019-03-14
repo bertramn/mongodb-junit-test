@@ -17,19 +17,33 @@
 package io.fares.junit.mongodb;
 
 import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class MongoExtensionIntegrationTestExample {
+public class MongoForEachExtensionIntegrationTestExample {
+
+  private static final String COLLECTION_NAME = "TestCollection";
 
   @RegisterExtension
-  MongoExtension mongo = MongoExtension.builder().build();
+  MongoForEachExtension mongo = MongoForEachExtension.defaultMongo();
+
+  @BeforeEach
+  void setupCollection() {
+    // disabled mongo on the 2nd test so the client will not be available
+    if (mongo.isStarted()) {
+      MongoClient client = mongo.getMongoClient();
+      MongoDatabase db = client.getDatabase(MongoExtension.UNIT_TEST_DB);
+      db.getCollection(COLLECTION_NAME);
+    }
+  }
 
   @Test
   public void testSomethingWithMongoRule() {
+    assertTrue(mongo.isStarted());
     MongoClient client = mongo.getMongoClient();
     assertNotNull(client);
     // whatever needs to be done in mongo using the provided mongo client
@@ -38,8 +52,7 @@ public class MongoExtensionIntegrationTestExample {
   @Test
   @WithoutMongo
   public void testSomethingWithoutMongoRule() {
-    MongoClient client = mongo.getMongoClient();
-    assertNull(client);
+    assertFalse(mongo.isStarted());
     // whatever needs to be done without mongo
   }
 

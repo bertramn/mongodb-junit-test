@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -32,13 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class MongoExtensionIntegrationTest {
+public class MongoForEachExtensionIntegrationTest {
 
   @Mock
   ExtensionContext context;
 
   @Spy
-  MongoExtension extension = MongoExtension.defaultMongo();
+  MongoForEachExtension extension = MongoForEachExtension.defaultMongo();
 
   @Test
   public void itShouldStartBefore() throws Exception {
@@ -46,12 +45,13 @@ public class MongoExtensionIntegrationTest {
     MongoClient client = extension.getMongoClient();
     assertNotNull(client);
     extension.shutdownMongo();
-    verify(extension, Mockito.times(1)).beforeEach(eq(context));
-    verify(extension, Mockito.times(1)).startMongo();
-    verify(extension, Mockito.times(1)).getMongoHost();
-    verify(extension, Mockito.times(1)).getMongoPort();
-    verify(extension, Mockito.times(1)).getMongoClient();
-    verify(extension, Mockito.times(1)).shutdownMongo();
+    verify(extension, times(1)).beforeEach(eq(context));
+    verify(extension, times(1)).startMongoWhenEnabled(eq(context));
+    verify(extension, times(1)).startMongo();
+    verify(extension, times(1)).getMongoHost();
+    verify(extension, times(1)).getMongoPort();
+    verify(extension, times(1)).getMongoClient();
+    verify(extension, times(1)).shutdownMongo();
     verifyNoMoreInteractions(extension);
   }
 
@@ -63,9 +63,10 @@ public class MongoExtensionIntegrationTest {
     when(context.getElement()).thenReturn(Optional.of(element));
     extension.beforeEach(context);
     extension.afterEach(context);
-    verify(extension, Mockito.times(1)).beforeEach(eq(context));
-    verify(extension, Mockito.times(1)).afterEach(eq(context));
-    verify(extension, Mockito.times(1)).shutdownMongo();
+    verify(extension, times(1)).startMongoWhenEnabled(eq(context));
+    verify(extension, times(1)).beforeEach(eq(context));
+    verify(extension, times(1)).afterEach(eq(context));
+    verify(extension, times(1)).stopMongoWhenEnabled(eq(context));
     verifyNoMoreInteractions(extension);
   }
 
@@ -73,11 +74,12 @@ public class MongoExtensionIntegrationTest {
   public void itShouldStopAfter() throws Exception {
     extension.startMongo();
     extension.afterEach(context);
-    verify(extension, Mockito.times(1)).startMongo();
-    verify(extension, Mockito.times(1)).afterEach(eq(context));
-    verify(extension, Mockito.times(1)).getMongoHost();
-    verify(extension, Mockito.times(1)).getMongoPort();
-    verify(extension, Mockito.times(1)).shutdownMongo();
+    verify(extension, times(1)).startMongo();
+    verify(extension, times(1)).afterEach(eq(context));
+    verify(extension, times(1)).getMongoHost();
+    verify(extension, times(1)).getMongoPort();
+    verify(extension, times(1)).stopMongoWhenEnabled(eq(context));
+    verify(extension, times(1)).shutdownMongo();
     verifyNoMoreInteractions(extension);
   }
 

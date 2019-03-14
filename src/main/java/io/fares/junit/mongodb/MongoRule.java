@@ -136,7 +136,7 @@ public class MongoRule implements TestRule {
   }
 
   /**
-   * @return The host port used to start the mongo server
+   * @return The host used to start the mongo server
    */
   public String getMongoHost() {
     return testCase.getMongoHost();

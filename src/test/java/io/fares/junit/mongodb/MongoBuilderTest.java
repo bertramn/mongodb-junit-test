@@ -16,7 +16,7 @@
  */
 package io.fares.junit.mongodb;
 
-import io.fares.junit.mongodb.MongoExtension.Builder;
+import io.fares.junit.mongodb.MongoForEachExtension.Builder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -30,12 +30,12 @@ import static org.mockito.Mockito.*;
 public class MongoBuilderTest {
 
   @Spy
-  Builder builder = MongoExtension.builder();
+  Builder builder = MongoForEachExtension.builder();
 
   @Test
   public void itShouldBuildWithCustomSettings1() {
 
-    MongoExtension extension = builder.host("test")
+    MongoForEachExtension extension = builder.host("test")
       .port(8080)
       .version("v123")
       .build();
